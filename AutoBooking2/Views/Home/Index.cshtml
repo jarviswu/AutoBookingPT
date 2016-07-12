@@ -1,0 +1,133 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+@model AutoBooking2.Models.SystemLogDBContext
+<script type="text/javascript">
+    $(function () {
+        $('#ClassTime').datetimepicker({
+            defaultDate: '@DateTime.Now.AddDays(1).Date',
+            format: "YYYY/MM/DD HH:mm"
+        });
+        $(".dropdown-menu li a").click(function () {
+            $("#Trainer").html($(this).text() + '<span class="caret pull-right"></span>');
+            $("#Trainer").val($(this).attr("value"));
+        });
+    });
+
+    function Booking() {
+        var traner = $("#Trainer").text();
+        var owner = $("input[name='Owner']:checked").val();
+        var classTime = $("#ClassTime input").val();
+        var enable = $("#Enable").is(":checked");
+        var cookies = $("#Cookies textarea").val();
+
+        $.ajax({
+            url: "@(Url.Action("Booking"))",
+            type: "POST",
+            data: { traner: traner, owner: owner, classTime: classTime, enable: enable, cookies: cookies },
+            success: function (rsp) {
+                alert(rsp.Message);
+            }
+        })
+    }
+
+    function Save() {
+        var traner = $("#Trainer").text();
+        var owner = $("input[name='Owner']:checked").val();
+        var classTime = $("#ClassTime input").val();
+        var enable = $("#Enable").is(":checked");
+        var cookies = $("#Cookies textarea").val();
+
+        $.ajax({
+            url: "@(Url.Action("Save"))",
+            type: "POST",
+            data: { traner: traner, owner: owner, classTime: classTime, enable: enable, cookies: cookies },
+            success: function (rsp) {
+                alert(rsp.Message);
+            }
+    })
+    }
+</script>
+
+<style>
+    body {
+        font-family: 'Microsoft YaHei';
+    }
+
+    label {
+        font-size: 18px;
+    }
+
+    input {
+        max-width: 600px;
+    }
+</style>
+
+<div class="jumbotron">
+    <h1>邬少的自动约课机器人<small> Beta 1.0</small></h1>
+</div>
+
+<div class="row">
+    <div>
+        <div class='col-md-6'>
+            <div class="form-group">
+                <label class="control-label">私教</label>
+                <div class="dropdown">
+                    <button style="width:300px" class="btn btn-default dropdown-toggle" type="button" id="Trainer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        请选择私教
+                        <span class="caret pull-right"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="Trainer">
+                        <li><a href="#" value="1022198">Alan</a></li>
+                        <li><a href="#" value="1022193">Vito</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">受虐者</label>
+                <div>
+                    <div class="radio radio-inline">
+                        <label>
+                            <input type="radio" name="Owner" value="W" checked>
+                            世界上最帅的人
+                        </label>
+                        &nbsp;&nbsp;
+                        <label>
+                            <input type="radio" name="Owner" value="C">
+                            世界上最美的人
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label">上课时间</label>
+                <div class='input-group date' id='ClassTime'>
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="Enable">
+                        自动约课
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class='col-md-6'>
+            <div class="form-group">
+                <label class="control-label">Cookies</label>
+                <div class='input-group date' id='Cookies'>
+                    <textarea style="max-width:555px;width:555px" type='text' class="form-control" rows="13"></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-lg btn-primary" id="Save" onclick="Save()"><i class="glyphicon glyphicon-floppy-disk"></i> 保存</button>
+        <button class="btn btn-lg btn-primary" id="BookingNow" onclick="Booking()"><i class="glyphicon glyphicon-ok"></i> 现在约课</button>
+    </div>
+</div>

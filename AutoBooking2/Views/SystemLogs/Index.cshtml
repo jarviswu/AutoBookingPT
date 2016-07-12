@@ -1,0 +1,84 @@
+﻿@model IEnumerable<AutoBooking2.Models.SystemLog>
+
+@{
+    ViewBag.Title = "日志查询";
+}
+<script>
+    $(function () {
+        $('.datetime').datetimepicker({
+            format: "YYYY/MM/DD HH:mm"
+        });
+    });
+</script>
+<h2>日志查询</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+    @using (Html.BeginForm())
+    {
+        <div class="row">
+            <div>
+                <div class="form-group form-inline col-md-3">
+                    <label class="control-label">Title</label>
+                    <input type='text' class="form-control" />
+                </div>
+
+                <div class="form-group form-inline col-md-3" style="padding: 0px;">
+                    <label class="control-label">TimeFrom</label>
+                    <input type='text' id='timeFrom' name="timeFrom" class="form-control datetime" />
+                </div>
+                <div class="form-group form-inline col-md-3">
+                    <label class="control-label">TimeTo</label>
+                    <input type='text' id='timeTo' name="timeTo" class="form-control datetime" />
+                </div>
+                <div class="form-group form-inline col-md-3">
+                    <label class="control-label">Type</label>
+                    @Html.DropDownList("Types", ViewBag.Types as SelectList,"All", new { @class = "form-control" })
+                </div>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-default text-center"> 搜索</button>
+            </div>
+        </div>
+    }
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Type)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Message)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DataChange_lasttime)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Message)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataChange_lasttime)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                @Html.ActionLink("Details", "Details", new { id = item.ID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.ID })
+            </td>
+        </tr>
+    }
+
+</table>

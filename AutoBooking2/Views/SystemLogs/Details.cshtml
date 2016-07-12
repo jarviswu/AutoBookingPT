@@ -1,0 +1,50 @@
+﻿@model AutoBooking2.Models.SystemLog
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>SystemLog</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Title)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Message)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Message)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StackTrace)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.StackTrace)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.DataChange_lasttime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.DataChange_lasttime)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
