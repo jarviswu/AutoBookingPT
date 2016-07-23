@@ -28,58 +28,63 @@ namespace AutoBooking.Models
         public static string Message;
         public static Timer Timer;
         public static bool Enable = true;
+        public static object locker = new object();
 
         private static SystemLogDBContext db = new SystemLogDBContext();
 
         public static void PorcessBooking(object o)
         {
-            try
+            lock (locker)
             {
-                if (!Enable || DateTime.Now < BookingTime)
+                try
                 {
-                    Debug.WriteLine("No booking");
-                    return;
+                    if (!Enable || DateTime.Now < BookingTime)
+                    {
+                        Debug.WriteLine("No booking");
+                        return;
+                    }
+                    Debug.WriteLine("Begin booking");
+                    SystemLogDBContext db = new SystemLogDBContext();
+                    var bookingModel = db.BookingModel.Select(p => p).FirstOrDefault(p => p.ID == 1);
+                    LogHelper.WriteLog("Begin Booking", Newtonsoft.Json.JsonConvert.SerializeObject(bookingModel),
+                        LogType.Info);
+
+                    var standardDate = DateTime.Parse("2016-06-09 16:00");
+                    var standardTicks = 1465459200;
+                    var difTicks = (bookingModel.ClassDate - standardDate).TotalSeconds;
+
+                    var timeFromStamp = standardTicks + difTicks;
+                    var timeToStamp = timeFromStamp + 3600;
+
+                    var result = string.Empty;
+                    using (var client = new WebClient())
+                    {
+                        var values = new NameValueCollection();
+                        values["member_card_id"] = GetMemberCardID(bookingModel.Owner);
+                        values["card_cat_id"] = GetCardCatID(bookingModel.Owner);
+                        values["course_id"] = GetCourseID(bookingModel.Traner); //todo:待定
+                        values["class_id"] = GetClassID(bookingModel.ClassDate, bookingModel.Traner);
+                        values["time_from_stamp"] = timeFromStamp.ToString();
+                        values["time_to_stamp"] = timeToStamp.ToString();
+                        values["quantity"] = "1";
+
+                        client.Headers["Referer"] = "http://www.styd.cn/m/384378/user/bind";
+                        client.Headers["User-Agent"] = "Mozilla/5.0";
+                        client.Headers["Cookie"] = bookingModel.Cookies;
+
+                        var response = client.UploadValues("http://www.styd.cn/m/384378/course/order_confirm", values);
+                        result = Encoding.UTF8.GetString(response);
+                        var respBpdy = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseBody>(result);
+                        Message = respBpdy.msg;
+                        Debug.WriteLine(Message);
+                    }
+                    Enable = false;
+                    LogHelper.WriteLog("End Booking", Message, LogType.Info);
                 }
-                Debug.WriteLine("Begin booking");
-                SystemLogDBContext db = new SystemLogDBContext();
-                var bookingModel = db.BookingModel.Select(p => p).FirstOrDefault(p => p.ID == 1);
-                LogHelper.WriteLog("Begin Booking", Newtonsoft.Json.JsonConvert.SerializeObject(bookingModel), LogType.Info);
-
-                var standardDate = DateTime.Parse("2016-06-09 16:00");
-                var standardTicks = 1465459200;
-                var difTicks = (bookingModel.ClassDate - standardDate).TotalSeconds;
-
-                var timeFromStamp = standardTicks + difTicks;
-                var timeToStamp = timeFromStamp + 3600;
-
-                var result = string.Empty;
-                using (var client = new WebClient())
+                catch (Exception ex)
                 {
-                    var values = new NameValueCollection();
-                    values["member_card_id"] = GetMemberCardID(bookingModel.Owner);
-                    values["card_cat_id"] = GetCardCatID(bookingModel.Owner);
-                    values["course_id"] = GetCourseID(bookingModel.Traner);    //todo:待定
-                    values["class_id"] = GetClassID(bookingModel.ClassDate, bookingModel.Traner);
-                    values["time_from_stamp"] = timeFromStamp.ToString();
-                    values["time_to_stamp"] = timeToStamp.ToString();
-                    values["quantity"] = "1";
-
-                    client.Headers["Referer"] = "http://www.styd.cn/m/384378/user/bind";
-                    client.Headers["User-Agent"] = "Mozilla/5.0";
-                    client.Headers["Cookie"] = bookingModel.Cookies;
-
-                    var response = client.UploadValues("http://www.styd.cn/m/384378/course/order_confirm", values);
-                    result = Encoding.UTF8.GetString(response);
-                    var respBpdy = Newtonsoft.Json.JsonConvert.DeserializeObject<ResponseBody>(result);
-                    Message = respBpdy.msg;
-                    Debug.WriteLine(Message);
+                    LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error, ex.StackTrace);
                 }
-                Enable = false;
-                LogHelper.WriteLog("End Booking", Message, LogType.Info);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error, ex.StackTrace);
             }
         }
 

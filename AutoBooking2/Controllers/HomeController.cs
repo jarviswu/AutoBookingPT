@@ -1,12 +1,12 @@
-﻿using AutoBooking.Models;
+﻿using System;
+using System.Data.Entity;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+using AutoBooking.Models;
 using AutoBooking2.Helper;
 using AutoBooking2.Models;
-using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+using Newtonsoft.Json;
 
 namespace AutoBooking2.Controllers
 {
@@ -14,9 +14,9 @@ namespace AutoBooking2.Controllers
     {
         private SystemLogDBContext db = new SystemLogDBContext();
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View();
+            return View(await db.BookingModel.FirstOrDefaultAsync());
         }
 
         public ActionResult About()
@@ -33,7 +33,7 @@ namespace AutoBooking2.Controllers
             return View();
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> Save(string traner, string owner, DateTime classTime, bool enable, string cookies)
+        public async Task<ActionResult> Save(string traner, string owner, DateTime classTime, bool enable, string cookies)
         {
             try
             {
@@ -42,9 +42,9 @@ namespace AutoBooking2.Controllers
                 db.Entry(bookingModel).State = EntityState.Modified;
                 await db.SaveChangesAsync();
                 BookingModel.Enable = true;
-                BookingModel.Timer = new System.Threading.Timer(BookingModel.PorcessBooking, null, 0, 1000);
+                BookingModel.Timer = new Timer(BookingModel.PorcessBooking, null, 0, 1000);
 
-                LogHelper.WriteLog("Save", Newtonsoft.Json.JsonConvert.SerializeObject(bookingModel), LogType.Info);
+                LogHelper.WriteLog("Save", JsonConvert.SerializeObject(bookingModel), LogType.Info);
             }
             catch (Exception ex)
             {
@@ -53,7 +53,7 @@ namespace AutoBooking2.Controllers
             return Json(new { Message = "保存成功" });
         }
 
-        public async System.Threading.Tasks.Task<ActionResult> Booking(string traner, string owner, DateTime classTime, string cookies)
+        public async Task<ActionResult> Booking(string traner, string owner, DateTime classTime, string cookies)
         {
             try
             {
@@ -69,7 +69,7 @@ namespace AutoBooking2.Controllers
             {
                 LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error);
             }
-            return Json(new { Message = BookingModel.Message });
+            return Json(new { BookingModel.Message });
         }
     }
 }

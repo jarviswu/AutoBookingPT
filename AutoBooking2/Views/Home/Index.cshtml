@@ -1,7 +1,7 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
-@model AutoBooking2.Models.SystemLogDBContext
+@model AutoBooking2.Models.BookingInfo
 <script type="text/javascript">
     $(function () {
         $('#ClassTime').datetimepicker({
@@ -121,7 +121,9 @@
             <div class="form-group">
                 <label class="control-label">Cookies</label>
                 <div class='input-group date' id='Cookies'>
-                    <textarea style="max-width:555px;width:555px" type='text' class="form-control" rows="13"></textarea>
+                    <textarea style="max-width: 555px; width: 555px" type='text' class="form-control" rows="13">
+                        @Model.Cookies
+                    </textarea>
                 </div>
             </div>
         </div>
