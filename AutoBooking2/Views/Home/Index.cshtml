@@ -132,4 +132,7 @@
         <button class="btn btn-lg btn-primary" id="Save" onclick="Save()"><i class="glyphicon glyphicon-floppy-disk"></i> 保存</button>
         <button class="btn btn-lg btn-primary" id="BookingNow" onclick="Booking()"><i class="glyphicon glyphicon-ok"></i> 现在约课</button>
     </div>
+    <div class="text-right">
+        @Html.ActionLink("查看日志","Index", "SystemLogs",null, new { target = "_blank" })
+    </div>
 </div>

@@ -32,7 +32,7 @@ namespace AutoBooking2.Controllers
             }
             ViewBag.Types = new SelectList(db.Log.Select(p => p.Type).Distinct());
 
-            return View(await logs.ToListAsync());
+            return View(await logs.OrderByDescending(p=>p.DataChange_lasttime).ToListAsync());
         }
 
         // GET: SystemLogs/Details/5

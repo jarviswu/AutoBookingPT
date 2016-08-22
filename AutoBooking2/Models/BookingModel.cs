@@ -32,7 +32,12 @@ namespace AutoBooking.Models
 
         private static SystemLogDBContext db = new SystemLogDBContext();
 
-        public static void PorcessBooking(object o)
+        public BookingModel()
+        {
+            LogHelper.WriteLog("我他妈被回收了", "我他妈被回收了", LogType.Info);
+        }
+
+        public static async void PorcessBooking(object o)
         {
             lock (locker)
             {

@@ -10,10 +10,10 @@ namespace AutoBooking2.Helper
     {
         private static SystemLogDBContext db = new SystemLogDBContext();
 
-        public static async void WriteLog(string title, string message, LogType type, string stackTrace="")
+        public static void WriteLog(string title, string message, LogType type, string stackTrace = "")
         {
             db.Log.Add(new SystemLog { Title = title, Type = type.ToString(), Message = message, StackTrace = stackTrace });
-            await db.SaveChangesAsync();
+            db.SaveChanges();
         }
     }
 
