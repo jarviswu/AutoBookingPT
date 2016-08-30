@@ -51,7 +51,7 @@ namespace AutoBooking.Models
                     Debug.WriteLine("Begin booking");
                     SystemLogDBContext db = new SystemLogDBContext();
                     var bookingModel = db.BookingModel.Select(p => p).FirstOrDefault(p => p.ID == 1);
-                    LogHelper.WriteLog("Begin Booking", Newtonsoft.Json.JsonConvert.SerializeObject(bookingModel),
+                    LogHelper.WriteLogAsync("Begin Booking", Newtonsoft.Json.JsonConvert.SerializeObject(bookingModel),
                         LogType.Info);
 
                     var standardDate = DateTime.Parse("2016-06-09 16:00");
@@ -84,27 +84,31 @@ namespace AutoBooking.Models
                         Debug.WriteLine(Message);
                     }
                     Enable = false;
-                    LogHelper.WriteLog("End Booking", Message, LogType.Info);
+                    LogHelper.WriteLogAsync("End Booking", Message, LogType.Info);
                 }
                 catch (Exception ex)
                 {
-                    LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error, ex.StackTrace);
+                    LogHelper.WriteLogAsync("Booking Error", ex.Message, LogType.Error, ex.StackTrace);
+                    //Message = ex.Message + "," + ex.StackTrace;
                 }
             }
         }
 
         private static string GetClassID(DateTime date, string trainer)
         {
-            var strDate = date.ToShortDateString();
+            var strDate = date.ToString("yyyy-MM-dd");
             var url = $"http://www.styd.cn/m/384378/default/index?date={strDate}&shop_id=1001049&type=2";
 
             HtmlWeb web = new HtmlWeb();
             HtmlDocument doc = web.Load(url);
-            var href = doc.DocumentNode.SelectSingleNode("//p[text()='" + trainer + "常规课程']/../..").Attributes["href"].Value;
+            Message = url+ doc.DocumentNode.OuterHtml;
+            var xpath = "//p[text()[contains(.,'" + trainer + "常规课程')]]/../..";
+            var selectSingleNode = doc.DocumentNode.SelectSingleNode(xpath);
+            var href = selectSingleNode.Attributes["href"].Value;
+            
             var courseID = href.Split('/').Last();
 
             return courseID;
-
         }
 
         private static string GetCourseID(string trainer)

@@ -15,6 +15,12 @@ namespace AutoBooking2.Helper
             db.Log.Add(new SystemLog { Title = title, Type = type.ToString(), Message = message, StackTrace = stackTrace });
             db.SaveChanges();
         }
+
+        public static async void WriteLogAsync(string title, string message, LogType type, string stackTrace = "")
+        {
+            db.Log.Add(new SystemLog { Title = title, Type = type.ToString(), Message = message, StackTrace = stackTrace });
+            db.SaveChangesAsync();
+        }
     }
 
     public enum LogType

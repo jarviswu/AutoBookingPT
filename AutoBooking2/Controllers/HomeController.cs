@@ -33,14 +33,16 @@ namespace AutoBooking2.Controllers
             return View();
         }
 
-        public async Task<ActionResult> Save(string traner, string owner, DateTime classTime, bool enable, string cookies)
+        public ActionResult Save(string traner, string owner, DateTime classTime, bool enable, string cookies)
         {
             try
             {
+                LogHelper.WriteLog("Save", "s", LogType.Info);
                 var bookingModel = new BookingInfo { ID = 1, Traner = traner, Owner = owner, ClassDate = classTime, Cookies = cookies };
                 BookingModel.BookingTime = DateTime.Now.AddDays(1).Date;
+                //BookingModel.BookingTime = DateTime.Now.AddMinutes(1);
                 db.Entry(bookingModel).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                db.SaveChangesAsync();
                 BookingModel.Enable = true;
                 BookingModel.Timer = new Timer(BookingModel.PorcessBooking, null, 0, 1000);
 
@@ -50,6 +52,7 @@ namespace AutoBooking2.Controllers
             {
                 LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error);
             }
+            LogHelper.WriteLog("Save", "b", LogType.Info); 
             return Json(new { Message = "保存成功" });
         }
 
@@ -61,13 +64,14 @@ namespace AutoBooking2.Controllers
                 BookingModel.BookingTime = DateTime.Now.AddDays(-1).Date;
                 BookingModel.Enable = true;
                 db.Entry(bookingModel).State = EntityState.Modified;
-                await db.SaveChangesAsync();
+                db.SaveChangesAsync();
 
                 BookingModel.PorcessBooking(new object());
             }
             catch (Exception ex)
             {
                 LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error);
+                //BookingModel.Message = ex.Message;
             }
             return Json(new { BookingModel.Message });
         }
