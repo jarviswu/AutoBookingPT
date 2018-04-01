@@ -208,6 +208,7 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="BookingDomainService\BookingService.cs" />
     <Compile Include="Controllers\EFDbContext.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\SystemLogsController.cs" />
@@ -216,7 +217,6 @@
     </Compile>
     <Compile Include="Helper\LogHelper.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
-    <Compile Include="Models\BookingModel.cs" />
     <Compile Include="Models\ResponseBody.cs" />
     <Compile Include="Models\SystemLogDBContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

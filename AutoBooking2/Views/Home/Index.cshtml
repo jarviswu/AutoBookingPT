@@ -41,7 +41,7 @@
         $.ajax({
             url: "@(Url.Action("Save"))",
             type: "POST",
-            data: { traner: traner, owner: owner, classTime: classTime, enable: enable, cookies: cookies },
+            data: { traner: traner, owner: owner, classDate: classTime, enable: enable, cookies: cookies },
             success: function (rsp) {
                 alert(rsp.Message);
             }

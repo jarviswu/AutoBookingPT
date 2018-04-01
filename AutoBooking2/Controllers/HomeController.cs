@@ -3,10 +3,10 @@ using System.Data.Entity;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using AutoBooking.Models;
 using AutoBooking2.Helper;
 using AutoBooking2.Models;
 using Newtonsoft.Json;
+using BookingDomainService;
 
 namespace AutoBooking2.Controllers
 {
@@ -33,26 +33,22 @@ namespace AutoBooking2.Controllers
             return View();
         }
 
-        public ActionResult Save(string traner, string owner, DateTime classTime, bool enable, string cookies)
+        public ActionResult Save(string traner, string owner, DateTime classDate, bool enable, string cookies)
         {
             try
             {
-                LogHelper.WriteLog("Save", "s", LogType.Info);
-                var bookingModel = new BookingInfo { ID = 1, Traner = traner, Owner = owner, ClassDate = classTime, Cookies = cookies };
-                BookingModel.BookingTime = DateTime.Now.AddDays(1).Date;
-                //BookingModel.BookingTime = DateTime.Now.AddMinutes(1);
+                var bookingModel = new BookingInfo { ID = 1, Traner = traner, Owner = owner, ClassDate = classDate, Cookies = cookies };
                 db.Entry(bookingModel).State = EntityState.Modified;
                 db.SaveChangesAsync();
-                BookingModel.Enable = true;
-                BookingModel.Timer = new Timer(BookingModel.PorcessBooking, null, 0, 1000);
-
                 LogHelper.WriteLog("Save", JsonConvert.SerializeObject(bookingModel), LogType.Info);
+
+                BookingService.GetInstance().SetBookingDate(); 
             }
             catch (Exception ex)
             {
                 LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error);
+                return Json(new { Message = ex.Message });
             }
-            LogHelper.WriteLog("Save", "b", LogType.Info); 
             return Json(new { Message = "保存成功" });
         }
 
@@ -61,19 +57,17 @@ namespace AutoBooking2.Controllers
             try
             {
                 var bookingModel = new BookingInfo { ID = 1, Traner = traner, Owner = owner, ClassDate = classTime, Cookies = cookies };
-                BookingModel.BookingTime = DateTime.Now.AddDays(-1).Date;
-                BookingModel.Enable = true;
                 db.Entry(bookingModel).State = EntityState.Modified;
                 db.SaveChangesAsync();
 
-                BookingModel.PorcessBooking(new object());
+                BookingService.GetInstance().Book();
             }
             catch (Exception ex)
             {
                 LogHelper.WriteLog("Booking Error", ex.Message, LogType.Error);
-                //BookingModel.Message = ex.Message;
+                return Json(new { Message = ex.Message });
             }
-            return Json(new { BookingModel.Message });
+            return Json(new { Message = "预定成功" });
         }
     }
 }
